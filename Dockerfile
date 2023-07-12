@@ -1,21 +1,22 @@
-ARG BASE_IMAGE
-# Build is starting here
-FROM docker.io/library/golang:1.19 AS build
+ARG BASE_IMAGE=ubuntu:20.04
+FROM ${BASE_IMAGE} as build
 
 WORKDIR /go/src/oracledb_exporter
 COPY . .
 RUN go get -d -v
 
-ARG VERSION
-ENV VERSION ${VERSION:-0.1.0}
+ARG VERSION=0.5.1
+ENV VERSION ${VERSION}
+
+# Add the log level configuration
+ENV LOG_LEVEL info,debug
 
 RUN GOOS=linux GOARCH=amd64 go build -v -ldflags "-X main.Version=${VERSION} -s -w"
 
 FROM ${BASE_IMAGE} as exporter
-LABEL org.opencontainers.image.authors="Seth Miller,Yannig Perré <yannig.perre@gmail.com>"
-LABEL org.opencontainers.image.description="Oracle DB Exporter"
 
-ENV VERSION ${VERSION:-0.1.0}
+ENV VERSION=${VERSION}
+ENV LOG_LEVEL=${LOG_LEVEL}
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG LEGACY_TABLESPACE
