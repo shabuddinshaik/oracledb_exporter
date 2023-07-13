@@ -5,7 +5,7 @@ WORKDIR /go/src/oracledb_exporter
 COPY . .
 RUN go get -d -v
 
-ARG VERSION=0.5.2
+ARG VERSION=0.5.1
 ENV VERSION ${VERSION}
 
 # Add the log level configuration
